@@ -3,19 +3,21 @@ const mongoose = require('mongoose')
 const dotenv = require('dotenv')
 const cors = require('cors')
 const userRoute=require('./Routes/userRoute')
+const cookieParser=require('cookie-parser')
 
 const App = express()
 dotenv.config()
 
+App.use(cookieParser())
+
 App.use(express.json())
 App.use(cors({
-    origin: process.env.FrontEnd_URL
-    // Credential:true  
+    origin: process.env.FrontEnd_URL,
+    credentials:true 
 }))
 
 
 App.use(userRoute)
-
 
 
 async function mongoDB() {
