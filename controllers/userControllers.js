@@ -5,11 +5,12 @@ const GenToken = require('../config/GenerateToken')
 async function LoginController(req, res) {
     try {
         const { formObj } = req.body
+        console.log(formObj)
 
-        const email = formObj.email
+        const Email = formObj.email
         const password = formObj.password
 
-        if (!email || !password) {
+        if (!Email || !password) {
             return res.status(400).json(
                 {
                     success: false,
@@ -21,7 +22,7 @@ async function LoginController(req, res) {
         // applying validation to chek wheatehr the client data in in correct fomat or not
         //2.Email format
         const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-        if (!emailRegex.test(email)) {
+        if (!emailRegex.test(Email)) {
             return res.status(400).json(
                 {
                     success: false,
@@ -41,18 +42,21 @@ async function LoginController(req, res) {
             )
         }
 
-        const SavedUser= await SignUpModel.findOne(
-            {
-                Email:email
-            }
-        )
+        console.log("Email received:", Email);
+
+
+
+
+        const SavedUser= await SignUpModel.findOne({ Email })
+
+        console.log("User found:", SavedUser);
 
         if(!SavedUser)
         {
-            res.status(401).json(
+            return res.status(401).json(
                 {
                     success:false,
-                    messages: "user doesn't exit. please SignUp"
+                    message: "user doesn't exit. please SignUp"
                 }
             )
         }
@@ -63,10 +67,10 @@ async function LoginController(req, res) {
         
         if(IsCorrect)
         {
-            const Token= await GenToken(SavedUser._id, email)
+            const Token= await GenToken(SavedUser._id, Email)
             if(Token.success)
             {
-                res.cookie("Token",Token.message, {
+                res.cookie("Token",Token.message,{
                     httpOnly:true,
                     secure:true,
                     sameSite:"none",
